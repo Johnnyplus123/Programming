@@ -1,0 +1,81 @@
+.flex {
+    display: flex;
+}
+
+.checkout {
+    /* border: 2px solid red; */
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    background-color: rgb(236, 233, 229);
+    margin-left: 30px;
+    padding-left: 30px;
+    border-radius: 10px;
+
+}
+
+.checkout input {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    width: 500px;
+    border: 2px solid rgb(231, 226, 226);
+    padding-left: 10px;
+}
+
+.flex1 {
+    display: flex;
+}
+
+.flex1 input {
+    margin-top: 10px;
+}
+
+.flex2 {
+    display: flex;
+}
+
+.flex2 input {
+    margin-top: 10px;
+}
+
+.flex3 {
+    display: flex;
+}
+
+.flex3 input {
+    margin-top: 10px;
+}
+
+.order {
+    background-color: white;
+    margin-left: 40px;
+    width: 500px;
+    padding-left: 20px;
+    height: 800px;
+    display: flex;
+    flex-direction: column;
+}
+
+.btn {
+    margin-right: 20px;
+    background-color: green;
+    color: white;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+}
+.flex4{
+    display: flex;
+}
+.flex5 {
+    display: flex;
+}
+.flex6 {
+    display: flex;
+}
+.flex7 {
+    display: flex;
+}
+.flex8 {
+    display: flex;
+}

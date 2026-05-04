@@ -1,0 +1,85 @@
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f4f4f4;
+}
+
+header{
+    background:#333;
+    color:white;
+    padding:20px;
+    text-align:center;
+}
+
+nav a{
+    color:white;
+    margin:0 10px;
+    text-decoration:none;
+}
+
+nav a:hover{
+    color:orange;
+}
+
+section{
+    padding:40px;
+    max-width:900px;
+    margin:auto;
+}
+
+#about img{
+    width:150px;
+    border-radius:50%;
+    display:block;
+    margin-bottom:15px;
+}
+
+ul{
+    list-style:square;
+}
+
+.projects-container{
+    display:flex;
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:8px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    flex:1;
+}
+
+.card a{
+    text-decoration:none;
+    color:blue;
+}
+
+form{
+    display:flex;
+    flex-direction:column;
+}
+
+input, textarea{
+    margin-bottom:10px;
+    padding:10px;
+}
+
+button{
+    background:#333;
+    color:white;
+    padding:10px;
+    border:none;
+}
+
+button:hover{
+    background:orange;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    background:#222;
+    color:white;
+}
