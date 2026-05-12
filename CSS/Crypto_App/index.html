@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CoinPulse – Live crypto market tracker" />
+  <title>CoinPulse — Crypto Market Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     TICKER TAPE
+     ══════════════════════════════ -->
+<div id="ticker">
+  <div class="ticker-inner" id="tickerInner">
+    <div class="ticker-item"><span class="t-sym">Loading…</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     NAVBAR
+     ══════════════════════════════ -->
+<nav id="navbar">
+
+  <!-- Logo -->
+  <button class="logo" data-page="dashboard" onclick="showPage('dashboard')">
+    <span class="logo-dot"></span>
+    CoinPulse
+  </button>
+
+  <!-- Desktop center tabs -->
+  <div class="nav-center">
+    <button class="nav-tab active" data-page="dashboard" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-tab"        data-page="market"    onclick="showPage('market')">Market</button>
+    <button class="nav-tab"        data-page="watchlist" onclick="showPage('watchlist')">Watchlist</button>
+  </div>
+
+  <!-- Right controls -->
+  <div class="nav-right">
+
+    <!-- Search — hidden on phones via CSS -->
+    <div class="search-wrap nav-search-wrap" id="navSearchWrap">
+      <span class="s-icon">⌕</span>
+      <input type="search" id="globalSearch" placeholder="Search coins…" autocomplete="off" />
+      <div id="searchDrop"></div>
+    </div>
+
+    <!-- Refresh — hidden on phones via CSS (it's in bottom bar) -->
+    <button class="icon-btn" id="navRefreshBtn" onclick="manualRefresh()" title="Refresh">↺</button>
+
+    <!-- Watchlist icon — always visible -->
+    <button class="icon-btn" id="wlBtn" data-page="watchlist" onclick="showPage('watchlist')" title="Watchlist">
+      ☆
+      <span class="badge" id="wlBadge" style="display:none">0</span>
+    </button>
+
+    <!-- Hamburger — only tablet (641-900px), hidden on phones & desktop via CSS -->
+    <button class="icon-btn" id="hamburger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</nav>
+
+<!-- Mobile sidebar overlay (darkens the bg when drawer is open) -->
+<div id="sideOverlay"></div>
+
+<!-- ══════════════════════════════
+     LAYOUT SHELL
+     ══════════════════════════════ -->
+<div id="shell">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside id="sidebar">
+    <div class="sb-section">Navigation</div>
+    <button class="sb-btn active" data-page="dashboard" onclick="showPage('dashboard')">
+      <span class="sb-icon">◈</span> Dashboard
+    </button>
+    <button class="sb-btn" data-page="market" onclick="showPage('market')">
+      <span class="sb-icon">▦</span> Market
+    </button>
+    <button class="sb-btn" data-page="watchlist" onclick="showPage('watchlist')">
+      <span class="sb-icon">☆</span> Watchlist
+      <span class="sb-count" id="sbWlCount" style="display:none">0</span>
+    </button>
+
+    <div class="sb-section" style="margin-top:10px">Tools</div>
+    <button class="sb-btn" onclick="manualRefresh()">
+      <span class="sb-icon">↺</span> Refresh Data
+    </button>
+    <button class="sb-btn" onclick="toast('Data sourced from CoinGecko API','inf')">
+      <span class="sb-icon">◉</span> Data Source
+    </button>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main id="content">
+
+    <!-- ╔═════════════════════════╗
+         ║  DASHBOARD             ║
+         ╚═════════════════════════╝ -->
+    <section class="page active" id="page-dashboard">
+
+      <!-- Global stats -->
+      <div class="sec-hdr">
+        <div>
+          <div class="sec-title">Market Overview</div>
+          <div class="sec-sub">Global cryptocurrency statistics</div>
+        </div>
+      </div>
+      <div class="stats-grid" id="globalStats">
+        <div class="stat-card sk" style="height:86px"></div>
+        <div class="stat-card sk" style="height:86px"></div>
+        <div class="stat-card sk" style="height:86px"></div>
+        <div class="stat-card sk" style="height:86px"></div>
+      </div>
+
+      <!-- Top 3 -->
+      <div class="sec-hdr">
+        <div>
+          <div class="sec-title">Top Assets</div>
+          <div class="sec-sub">Largest by market capitalisation</div>
+        </div>
+        <button class="filter-btn" onclick="showPage('market')">View All →</button>
+      </div>
+      <div class="featured-grid" id="featuredCoins"></div>
+
+      <!-- Movers -->
+      <div class="sec-hdr" style="margin-top:.25rem">
+        <div>
+          <div class="sec-title">24h Movers</div>
+          <div class="sec-sub">Top gainers and losers today</div>
+        </div>
+      </div>
+      <div class="movers-grid">
+        <div class="mover-card">
+          <div class="mover-title">
+            <span class="mover-dot" style="background:var(--green)"></span>
+            Top Gainers
+          </div>
+          <div id="gainersList"></div>
+        </div>
+        <div class="mover-card">
+          <div class="mover-title">
+            <span class="mover-dot" style="background:var(--red)"></span>
+            Top Losers
+          </div>
+          <div id="losersList"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ╔═════════════════════════╗
+         ║  MARKET                ║
+         ╚═════════════════════════╝ -->
+    <section class="page" id="page-market">
+
+      <div class="sec-hdr">
+        <div>
+          <div class="sec-title">All Coins</div>
+          <div class="sec-sub" id="mktSub">Loading…</div>
+        </div>
+        <!-- Inline search for market page -->
+        <div class="search-wrap" style="margin:0">
+          <span class="s-icon">⌕</span>
+          <input type="search" id="mktSearch" placeholder="Filter…"
+            style="width:160px" oninput="filterByQuery(this.value)" />
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn"        onclick="setFilter('gainers',this)">▲ Gainers</button>
+        <button class="filter-btn"        onclick="setFilter('losers',this)">▼ Losers</button>
+        <button class="filter-btn"        onclick="setFilter('top10',this)">Top 10</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="coin-table">
+          <thead>
+            <tr>
+              <th onclick="sortBy('rank')">#</th>
+              <th onclick="sortBy('name')">Coin</th>
+              <th class="rt" onclick="sortBy('price')">Price</th>
+              <th class="rt" onclick="sortBy('change')">24h %</th>
+              <th class="rt col-cap" onclick="sortBy('cap')">Mkt Cap</th>
+              <th class="rt col-vol" onclick="sortBy('vol')">Volume</th>
+              <th class="rt">Watch</th>
+            </tr>
+          </thead>
+          <tbody id="mktTbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+
+    </section>
+
+    <!-- ╔═════════════════════════╗
+         ║  WATCHLIST             ║
+         ╚═════════════════════════╝ -->
+    <section class="page" id="page-watchlist">
+
+      <div class="sec-hdr">
+        <div>
+          <div class="sec-title">Watchlist</div>
+          <div class="sec-sub" id="wlSub">Your saved coins</div>
+        </div>
+      </div>
+      <div id="wlContent"></div>
+
+    </section>
+
+    <!-- ╔═════════════════════════╗
+         ║  COIN DETAIL           ║
+         ╚═════════════════════════╝ -->
+    <section class="page" id="page-detail">
+
+      <button class="back-btn" onclick="goBack()">← Back</button>
+
+      <div class="detail-hero"  id="detailHero"></div>
+      <div class="detail-stats" id="detailStats"></div>
+
+      <div class="chart-card">
+        <!-- Chart toolbar: timeframe buttons + LIVE -->
+        <div class="chart-toolbar">
+          <div class="time-row">
+            <button class="time-btn"        onclick="setChartMode('1',this)">1D</button>
+            <button class="time-btn active" onclick="setChartMode('7',this)">7D</button>
+            <button class="time-btn"        onclick="setChartMode('30',this)">30D</button>
+            <button class="time-btn"        onclick="setChartMode('90',this)">90D</button>
+            <button class="time-btn"        onclick="setChartMode('365',this)">1Y</button>
+          </div>
+          <button class="live-btn" id="liveBtn" onclick="toggleLive()">
+            <span class="live-dot" id="liveDot"></span>
+            LIVE
+          </button>
+        </div>
+
+        <!-- Live stats strip — visible only when LIVE is on -->
+        <div class="live-strip" id="liveStrip">
+          <div class="ls-item">
+            <span class="ls-label">Price</span>
+            <span class="ls-val" id="lsPrice">—</span>
+          </div>
+          <div class="ls-sep"></div>
+          <div class="ls-item">
+            <span class="ls-label">24h Change</span>
+            <span class="ls-val" id="lsChange">—</span>
+          </div>
+          <div class="ls-sep"></div>
+          <div class="ls-item">
+            <span class="ls-label">Market Cap</span>
+            <span class="ls-val" id="lsMcap">—</span>
+          </div>
+          <div class="ls-sep"></div>
+          <div class="ls-item">
+            <span class="ls-label">24h Volume</span>
+            <span class="ls-val" id="lsVol">—</span>
+          </div>
+          <div class="ls-sep"></div>
+          <div class="ls-item">
+            <span class="ls-label">Updated</span>
+            <span class="ls-val" id="lsTime">—</span>
+          </div>
+        </div>
+
+        <canvas id="mainChart"></canvas>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════
+     BOTTOM TAB BAR  (mobile only)
+     ══════════════════════════════ -->
+<nav id="bottomBar">
+  <div class="bb-inner">
+    <button class="bb-btn active" data-page="dashboard" onclick="showPage('dashboard')">
+      <span class="bb-icon">◈</span>
+      <span class="bb-label">Dashboard</span>
+    </button>
+    <button class="bb-btn" data-page="market" onclick="showPage('market')">
+      <span class="bb-icon">▦</span>
+      <span class="bb-label">Market</span>
+    </button>
+    <button class="bb-btn" data-page="watchlist" onclick="showPage('watchlist')">
+      <span class="bb-icon">☆</span>
+      <span class="bb-label">Watchlist</span>
+    </button>
+    <button class="bb-btn" data-page="" onclick="manualRefresh()">
+      <span class="bb-icon">↺</span>
+      <span class="bb-label">Refresh</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
